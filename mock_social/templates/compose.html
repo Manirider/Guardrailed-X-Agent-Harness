@@ -1,0 +1,22 @@
+<html>
+<body>
+<h1>Compose Tweet</h1>
+<form id="tweet-form" method="post" action="/api/tweet">
+<textarea id="tweet-text" name="text"></textarea>
+<button id="post-btn" type="submit">Post</button>
+</form>
+<div id="post-success" style="display:none;color:green">Posted!</div>
+<div id="posted-text"></div>
+<script>
+const form = document.getElementById('tweet-form');
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const formData = new FormData(form);
+  const res = await fetch('/api/tweet', {method:'POST', body:formData});
+  const data = await res.json();
+  document.getElementById('post-success').style.display='block';
+  document.getElementById('posted-text').textContent = data.text;
+});
+</script>
+</body>
+</html>

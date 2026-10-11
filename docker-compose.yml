@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  mock_social:
+    build:
+      context: .
+      dockerfile: Dockerfile.mock_social
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./data:/app/data
+
+  agent:
+    build: .
+    environment:
+      - MOCK_SOCIAL_URL=http://mock_social:8080
+      - LLM_BASE_URL=http://mock-llm:8000/v1
+      - MOCK_USERNAME=test_user
+      - MOCK_PASSWORD=test_password
+      - STATE_DIR=/app/data
+    depends_on:
+      mock_social:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

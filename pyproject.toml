@@ -1,0 +1,20 @@
+﻿[project]
+name = "guardrailed-x-agent-harness"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.27",
+    "pydantic>=2.5",
+    "pandas>=2.0",
+    "playwright>=1.40",
+    "httpx>=0.26",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.3",
+    "mypy>=1.8",
+]

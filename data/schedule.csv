@@ -1,0 +1,9 @@
+row_id,post_date,raw_text
+row_001,2026-10-03,Check out our new feature release today!
+row_002,2026-10-03,Remember to backup your data https://example.com/backup
+row_003,2026-10-04,Future post about upcoming event
+row_004,2026-09-30,Yesterday's post should be ignored
+row_005,2026-10-03,Hello @alice, thanks for your support
+row_006,2026-10-03,This is a very long text that will definitely exceed the maximum allowed length for a tweet because it keeps going on and on without stopping and we need to make sure the guardrail catches it properly when the LLM makes it even longer with extra fluff and unnecessary details that push it over the limit of 280 characters which is the maximum we allow for tweets in this system and we want to ensure it's handled correctly
+row_007,2026-10-03,Investment opportunity guaranteed returns
+row_008,2026-10-03,Visit https://example.com for details

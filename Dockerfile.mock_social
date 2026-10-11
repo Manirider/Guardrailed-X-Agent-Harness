@@ -1,0 +1,6 @@
+FROM python:3.11-slim
+WORKDIR /app
+COPY mock_social/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY mock_social ./mock_social
+CMD ["python", "-m", "mock_social.mock_server"]
