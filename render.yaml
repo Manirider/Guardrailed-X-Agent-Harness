@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: guardrailed-x-agent-harness
+    runtime: docker
+    plan: free
+    region: oregon
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: 8080

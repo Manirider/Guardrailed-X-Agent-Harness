@@ -6,12 +6,16 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pathlib import Path
 
-app = FastAPI()
+app = FastAPI(title="Guardrailed X Agent Harness API", version="0.1.0")
 templates_path = Path(__file__).parent / "templates"
 templates = Jinja2Templates(directory=str(templates_path))
 
 # In-memory posted store for tests
 posted_texts: list[str] = []
+
+@app.get("/")
+def root():
+    return RedirectResponse(url="/docs")
 
 @app.get("/health")
 def health():
