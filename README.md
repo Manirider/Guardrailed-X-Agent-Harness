@@ -235,3 +235,59 @@ The guardrail engine evaluates candidate text through three sequential, non-bypa
              │ Publishing Action   │ │ (Error Logged)      │
              └─────────────────────┘ └─────────────────────┘
 ```
+
+## Quantitative Evaluation and Metrics
+
+The benchmark suite evaluates agent reliability using execution traces generated during production or test runs:
+
+```bash
+python evaluate.py
+```
+
+The script parses `traces.jsonl` and computes key metrics saved to `metrics.json`:
+
+| Metric Name | Calculation Method | Target Objective |
+| :-- | :-- | :-- |
+| `task_completion_rate` | Distinct successful posts divided by attempted due rows | Maximized throughput without duplicate posts |
+| `groundedness_score` | Proportion of evaluated LLM outputs passing groundedness checks | Elimination of ungrounded URLs and mentions |
+| `guardrail_trigger_rate` | Proportion of runs where at least one safety check was activated | Accurate detection and mitigation of policy violations |
+
+### Structured Observability Traces
+
+Every execution generates a comprehensive audit entry in `traces.jsonl`:
+
+```json
+{
+  "timestamp": "2026-10-03T14:22:10.512401+00:00",
+  "run_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "row_id": "row_002",
+  "post_date": "2026-10-03",
+  "raw_text": "Remember to backup your data https://example.com/backup",
+  "llm_text": "Always backup your data! Visit https://example.com/backup #Security",
+  "guardrail_passed": true,
+  "guardrail_failure_reason": null,
+  "final_posted_text": "Always backup your data! Visit https://example.com/backup #Security",
+  "action_status": "success",
+  "fallback_used": false,
+  "duration_ms": 312
+}
+```
+
+## Testing and Quality Assurance
+
+Execute the complete test suite across all subsystems:
+
+```bash
+pytest
+```
+
+The automated test suite verifies:
+- **Guardrail Unit Tests**: Edge cases for character boundaries, punctuation, URL variants, and case insensitivity.
+- **Scheduler Logic**: UTC date matching, future post filtering, and handling multiple due rows.
+- **State Persistence**: Idempotency checks and atomic updates to prevent double-posting.
+- **Evaluation Accuracy**: Mathematical validation of completion rates, groundedness ratios, and trigger frequencies.
+- **End-to-End Flow**: Integration runs traversing scheduling through simulated browser dispatch.
+
+## License
+
+This project is licensed under the MIT License. See the LICENSE file for details.
