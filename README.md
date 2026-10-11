@@ -101,3 +101,84 @@ guardrailed-x-agent-harness/
 ├── pytest.ini                 # Pytest test execution settings
 └── .env.example               # Environment variables configuration template
 ```
+
+## Getting Started
+
+### Prerequisites
+
+- Python 3.11 or later
+- Docker and Docker Compose (recommended for containerized execution)
+- Modern web browser drivers (managed automatically via Playwright)
+
+### Local Environment Setup
+
+1. **Clone the repository**
+
+```bash
+git clone https://github.com/Manirider/Guardrailed-X-Agent-Harness.git
+cd Guardrailed-X-Agent-Harness
+```
+
+2. **Initialize python environment**
+
+```bash
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+pip install -e ".[dev]"
+playwright install
+```
+
+3. **Configure environment settings**
+
+```bash
+cp .env.example .env
+```
+
+### Configuration Reference
+
+Configure execution parameters via `.env`:
+
+| Parameter | Type | Default | Description |
+| :-- | :-- | :-- | :-- |
+| `LLM_BASE_URL` | string | `http://mock-llm:8000/v1` | Base URL for OpenAI-compatible endpoint |
+| `OPENAI_API_KEY` | string | `replace_me` | Authentication key for LLM provider |
+| `MOCK_SOCIAL_URL` | string | `http://mock_social:8080` | URL of target social media interface |
+| `MOCK_USERNAME` | string | `test_user` | Authentication username for target platform |
+| `MOCK_PASSWORD` | string | `test_password` | Authentication password for target platform |
+| `LLM_MODEL` | string | `mock-model` | Target model name for completion requests |
+| `LLM_TEMPERATURE` | float | `0` | Model temperature (0 for deterministic output) |
+| `HITL_ENABLED` | boolean | `false` | Gate publishing behind human approval prompt |
+| `HEADLESS` | boolean | `true` | Run Playwright browser without visual UI |
+| `POSTING_ENABLED` | boolean | `true` | Toggle browser publishing actions |
+| `LOG_LEVEL` | string | `INFO` | Standard logging verbosity |
+| `STATE_DIR` | path | `./data` | Directory for posted ID tracking and state files |
+
+## Running the Agent
+
+### Option 1: Docker Compose (Full Stack)
+
+Launch both the mock social media service and the posting agent with automated healthchecks:
+
+```bash
+docker compose up --build
+```
+
+The mock social server becomes reachable at `http://localhost:8080`.
+
+### Option 2: Local CLI Execution
+
+Run the agent harness directly against the configured schedule:
+
+```bash
+python -m harness.cli
+```
+
+### Schedule CSV Specification
+
+The scheduler reads `schedule.csv` using the following schema:
+
+| Field | Format | Description |
+| :-- | :-- | :-- |
+| `row_id` | string | Unique primary key identifying the post record |
+| `post_date` | YYYY-MM-DD | Target publication date in UTC |
+| `raw_text` | string | Source content to be refined and posted |
