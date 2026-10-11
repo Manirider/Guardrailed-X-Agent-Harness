@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "guardrailed-x-agent-harness"
 version = "0.1.0"
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 dependencies = [
     "fastapi>=0.110",
     "uvicorn[standard]>=0.27",
