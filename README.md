@@ -90,7 +90,7 @@ guardrailed-x-agent-harness/
 │   ├── test_llm_schema.py     # Pydantic output model tests
 │   ├── test_scheduler.py      # Scheduling and date filtering tests
 │   ├── test_state_manager.py  # State persistence and recovery tests
-│   ├── test_tool_registry.py  # Tool registration tests
+│   ├── test_tool_registry.py  # Tool registry tests
 │   └── test_traces.py         # Telemetry schema tests
 ├── schedule.csv               # Input posting schedule
 ├── evaluate.py                # Quantitative evaluation and benchmark runner
@@ -182,3 +182,56 @@ The scheduler reads `schedule.csv` using the following schema:
 | `row_id` | string | Unique primary key identifying the post record |
 | `post_date` | YYYY-MM-DD | Target publication date in UTC |
 | `raw_text` | string | Source content to be refined and posted |
+
+## Deterministic Guardrail Chain
+
+The guardrail engine evaluates candidate text through three sequential, non-bypassable verification steps:
+
+### 1. Hard Length Limitation
+- Validates that `len(candidate_text) <= 280` characters.
+- Violations append an explicit error tag (`length:<count>`) to the failure reasons.
+
+### 2. Banned Term Inspection
+- Performs token-aware regular expression scanning across configurable prohibited terms.
+- Ensures words like `guarantee` or `investment` are blocked without false-positive matching on substrings.
+
+### 3. Groundedness and Entity Preservation
+- Extracts external resource links (`https?://[^\s]+`) and social mentions (`@[A-Za-z0-9_]+`) from both raw source and candidate text.
+- Enforces strict entity subset matching:
+  - Any URL appearing in the candidate that was not in the source triggers `introduced_url`.
+  - Any mention appearing in the candidate that was not in the source triggers `introduced_mention`.
+
+### Automated Fallback & Safety Gates
+
+```
+                    ┌───────────────────────────┐
+                    │  Candidate Text Generated │
+                    └─────────────┬─────────────┘
+                                  │
+                    ┌─────────────▼─────────────┐
+                    │ Guardrail Validation Run  │
+                    └─────────────┬─────────────┘
+                                  │
+                   Pass ┌─────────┴─────────┐ Fail
+                        │                   │
+                        ▼                   ▼
+             ┌─────────────────────┐ ┌─────────────────────┐
+             │ Keep Formatted Text │ │ Fallback to Raw     │
+             │ (Candidate Approved)│ │ Source Text         │
+             └──────────┬──────────┘ └──────────┬──────────┘
+                        │                   │
+                        └─────────┬─────────┘
+                                  │
+                    ┌─────────────▼─────────────┐
+                    │ Post-Fallback Safety Gate │
+                    │ len(final_text) <= 280?   │
+                    └─────────────┬─────────────┘
+                                  │
+                   Pass ┌─────────┴─────────┐ Fail
+                        │                   │
+                        ▼                   ▼
+             ┌─────────────────────┐ ┌─────────────────────┐
+             │ Dispatch Playwright │ │ Reject and Abort    │
+             │ Publishing Action   │ │ (Error Logged)      │
+             └─────────────────────┘ └─────────────────────┘
+```
