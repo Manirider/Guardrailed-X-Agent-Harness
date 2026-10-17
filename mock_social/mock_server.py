@@ -39,12 +39,20 @@ def login(username: str = Form(...), password: str = Form(...)):
 @app.get("/compose/tweet", response_class=HTMLResponse)
 def compose_page(request: Request):
     last_posted = posted_texts[-1] if posted_texts else ""
-    return templates.TemplateResponse(request=request, name="compose.html", context={"last_posted": last_posted})
+    return templates.TemplateResponse(
+        request=request,
+        name="compose.html",
+        context={"last_posted": last_posted, "tweets": list(reversed(posted_texts))},
+    )
 
 @app.post("/api/tweet")
 def post_tweet(text: str = Form(...)):
     posted_texts.append(text)
     return {"status": "ok", "text": text}
+
+@app.get("/api/tweets")
+def get_all_tweets():
+    return {"count": len(posted_texts), "tweets": posted_texts}
 
 @app.post("/api/internal/reset")
 def reset():
