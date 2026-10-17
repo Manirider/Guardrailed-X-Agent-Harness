@@ -21,9 +21,14 @@ def root():
 def health():
     return {"status": "ok"}
 
+@app.exception_handler(Exception)
+async def generic_exception_handler(request: Request, exc: Exception):
+    import traceback
+    return HTMLResponse(content=f"<h1>Internal Server Error</h1><pre>{traceback.format_exc()}</pre>", status_code=500)
+
 @app.get("/login", response_class=HTMLResponse)
 def login_page(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
+    return templates.TemplateResponse(request=request, name="login.html")
 
 @app.post("/login")
 def login(username: str = Form(...), password: str = Form(...)):
@@ -34,7 +39,7 @@ def login(username: str = Form(...), password: str = Form(...)):
 @app.get("/compose/tweet", response_class=HTMLResponse)
 def compose_page(request: Request):
     last_posted = posted_texts[-1] if posted_texts else ""
-    return templates.TemplateResponse("compose.html", {"request": request, "last_posted": last_posted})
+    return templates.TemplateResponse(request=request, name="compose.html", context={"last_posted": last_posted})
 
 @app.post("/api/tweet")
 def post_tweet(text: str = Form(...)):
