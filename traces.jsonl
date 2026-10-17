@@ -15,3 +15,4 @@
 {"timestamp":"2026-10-03T00:14:00Z","row_id":"row_009","raw_text":"Malformed LLM JSON test","llm_text":"","guardrail_passed":false,"guardrail_failure_reason":"llm_schema_invalid","final_posted_text":"Malformed LLM JSON test","action_status":"success","run_id":"r15","fallback_used":true,"llm_schema_valid":false}
 {"timestamp": "2026-01-01T00:00:00Z", "row_id": "r1", "raw_text": "a", "llm_text": "b", "guardrail_passed": true, "final_posted_text": "b", "action_status": "success"}
 {"timestamp": "2026-01-01T00:00:00Z", "row_id": "r1", "raw_text": "a", "llm_text": "b", "guardrail_passed": true, "final_posted_text": "b", "action_status": "success"}
+{"timestamp": "2026-01-01T00:00:00Z", "row_id": "r1", "raw_text": "a", "llm_text": "b", "guardrail_passed": true, "final_posted_text": "b", "action_status": "success"}
